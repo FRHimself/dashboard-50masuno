@@ -1,0 +1,139 @@
+---
+title: "Dashboard 50+Uno – Análisis Político"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-title: "Contenido"
+    toc-location: left
+    smooth-scroll: true
+    css: assets/style.css
+sidebar:
+  style: "docked"
+  title: "50+Uno"
+  logo: assets/logo_50masuno.png
+  search: true
+  width: 260px
+  contents:
+    - section: "Visualizaciones"
+      contents:
+        - href: "#mapa"
+          text: "Mapa de Provincias"
+        - href: "#discurso"
+          text: "Análisis del Discurso"
+    - section: "Datos"
+      contents:
+        - href: "#tabla"
+          text: "Base de Datos"
+        - href: "#alertas"
+          text: "Alertas"
+        - href: "#descargas"
+          text: "Descargar Informes"
+---
+
+# Mapa de Provincias {#mapa}
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(sf)
+
+set.seed(123)
+provincias <- c("Lima","Arequipa","Cusco","Piura","La Libertad","Puno","Ayacucho","Junín","Ica","Loreto")
+apariciones <- data.frame(
+  provincia = provincias,
+  apariciones_2025 = sample(5:40, length(provincias), replace = TRUE)
+)
+
+url <- "https://raw.githubusercontent.com/johan/world.geo.json/master/countries/PER.geo.json"
+peru <- st_read(url, quiet = TRUE)
+peru$provincia <- sample(provincias, nrow(peru), replace = TRUE)
+
+data_map <- left_join(peru, apariciones, by = "provincia")
+
+gg <- ggplot(data_map) +
+  geom_sf(aes(fill = apariciones_2025), color = "white") +
+  scale_fill_viridis_c(option = "C") +
+  labs(title = "Apariciones públicas de Rafael López Aliaga por provincia (2025)",
+       fill = "Apariciones") +
+  theme_minimal()
+
+ggplotly(gg)
+```
+
+# Análisis del Discurso {#discurso}
+
+```{r}
+library(plotly)
+mes <- month.abb[1:10]
+df <- data.frame(
+  mes=factor(mes, levels=mes),
+  conservadurismo=runif(10,40,80),
+  proteccionismo=runif(10,20,70),
+  estado_derecho=runif(10,30,95),
+  libertad_prensa=runif(10,10,60)
+)
+plot_ly(df, x=~mes) %>% 
+  add_lines(y=~conservadurismo, name="Conservadurismo") %>%
+  add_lines(y=~proteccionismo, name="Proteccionismo") %>%
+  add_lines(y=~estado_derecho, name="Estado de Derecho") %>%
+  add_lines(y=~libertad_prensa, name="Libertad de Prensa") %>%
+  layout(title="Evolución del Discurso (2025)", hovermode="x unified")
+```
+
+# Base de Datos {#tabla}
+
+```{r}
+library(DT)
+datatable(df, extensions="Responsive", class="stripe hover order-column",
+          options=list(pageLength=10, autoWidth=TRUE))
+```
+
+# Alertas {#alertas}
+
+:::::: alert-card
+::: alert-title
+#Alerta50+Uno.
+:::
+
+::: alert-metadata
+Rafael López Aliaga · Entrevista con Claudia Toro · 23-11-2025<br> Mención directa BKF - RDL: <strong>Alta</strong><br> Link: <a href="https://www.facebook.com/share/v/19FLchxejZ/">https://www.facebook.com/share/v/19FLchxejZ/</a>
+:::
+
+::: alert-text
+Rafael López Aliaga centró su discurso en el caso Brookfield–Rutas de Lima, la minería, la justicia y su plan de gobierno...
+:::
+::::::
+
+:::::: alert-card
+::: alert-title
+#Alerta50+Uno.
+:::
+
+::: alert-metadata
+Rafael López Aliaga · Encuentro Renovador Ventanilla · 22-11-2025<br> Mención directa BKF - RDL: <strong>Alta</strong><br> Link: <a href="https://www.facebook.com/share/v/1BRYxVU72i/">https://www.facebook.com/share/v/1BRYxVU72i/</a>
+:::
+
+::: alert-text
+Rafael López Aliaga abordó una amplia agenda política y social con un tono combativo...
+:::
+::::::
+
+:::::: alert-card
+::: alert-title
+#Alerta50+Uno.
+:::
+
+::: alert-metadata
+Renzo Reggiardo · Encendido del árbol · 21-11-2025<br> Mención directa BKF - RDL: <strong>Ninguna</strong><br> Link: <a href="https://www.facebook.com/share/v/1DHgn3mGhq/">https://www.facebook.com/share/v/1DHgn3mGhq/</a>
+:::
+
+::: alert-text
+Renzo Reggiardo pronunció un discurso breve y simbólico, centrado en valores navideños...
+:::
+::::::
+
+# Descargas {#descargas}
+
+📄 **Informe Territorial (PDF)** — próximamente<br> 📄 **Informe Discursivo (PDF)** — próximamente<br> 📄 **Informe General (PDF)** — próximamente
